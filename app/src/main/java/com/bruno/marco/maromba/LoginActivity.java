@@ -13,11 +13,13 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.util.JSON;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -27,6 +29,9 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -48,7 +53,7 @@ public class LoginActivity extends ActionBarActivity {
         setContentView(R.layout.activity_login);
     }
 
-    public void login(View v) {
+    public void login(View v) throws JSONException {
 //        startActivity(new Intent(this, MainActivity.class));
         RequestQueue queue = Volley.newRequestQueue(this);
         String url ="https://maromba-server.herokuapp.com/api";
@@ -77,7 +82,40 @@ public class LoginActivity extends ActionBarActivity {
                 toast.show();
             }
         });
-// Add the request to the RequestQueue.
-        queue.add(stringRequest);
+        JSONObject jo = new JSONObject();
+        jo.put("name", "Marco");
+        jo.put("email", "Marco@maromba.com.whey");
+        jo.put("senha", "FrangoEBatataDoce");
+        JSONObject mainJson = new JSONObject();
+        mainJson.put("body", jo);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+                "https://maromba-server.herokuapp.com/users",
+                mainJson,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Context context = getApplicationContext();
+                        CharSequence text = response.toString();
+                        int duration = Toast.LENGTH_SHORT;
+
+                        Toast toast = Toast.makeText(context, text, duration);
+                        toast.show();
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                        Context context = getApplicationContext();
+                        CharSequence text = error.toString();
+                        int duration = Toast.LENGTH_SHORT;
+
+                        Toast toast = Toast.makeText(context, text, duration);
+                        toast.show();
+                    }
+                });
+        queue.add(jsonObjectRequest);
+
+
     }
 }
