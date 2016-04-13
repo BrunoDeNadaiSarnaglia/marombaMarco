@@ -40,7 +40,9 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -59,42 +61,41 @@ public class LoginActivity extends ActionBarActivity {
         String url ="https://maromba-server.herokuapp.com/api";
 
 // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Display the first 500 characters of the response string.
-                        Context context = getApplicationContext();
-                        CharSequence text = response;
-                        int duration = Toast.LENGTH_SHORT;
-
-                        Toast toast = Toast.makeText(context, text, duration);
-                        toast.show();
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Context context = getApplicationContext();
-                CharSequence text = error.toString();
-                int duration = Toast.LENGTH_SHORT;
-
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
-            }
-        });
+//        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+//                new Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String response) {
+//                        // Display the first 500 characters of the response string.
+//                        Context context = getApplicationContext();
+//                        CharSequence text = response;
+//                        int duration = Toast.LENGTH_SHORT;
+//
+//                        Toast toast = Toast.makeText(context, text, duration);
+//                        toast.show();
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                Context context = getApplicationContext();
+//                CharSequence text = error.toString();
+//                int duration = Toast.LENGTH_SHORT;
+//
+//                Toast toast = Toast.makeText(context, text, duration);
+//                toast.show();
+//            }
+//        });
         JSONObject jo = new JSONObject();
-        jo.put("name", "Marco");
+//        jo.put("name", "Marco");
         jo.put("email", "Marco@maromba.com.whey");
         jo.put("senha", "FrangoEBatataDoce");
         JSONObject mainJson = new JSONObject();
         mainJson.put("body", jo);
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
-                "https://maromba-server.herokuapp.com/users",
-                mainJson,
-                new Response.Listener<JSONObject>() {
+        StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST,
+                "http://10.0.3.2:5000/api/users",
+                new Response.Listener<String>() {
                     @Override
-                    public void onResponse(JSONObject response) {
+                    public void onResponse(String response) {
                         Context context = getApplicationContext();
                         CharSequence text = response.toString();
                         int duration = Toast.LENGTH_SHORT;
@@ -107,13 +108,21 @@ public class LoginActivity extends ActionBarActivity {
                     public void onErrorResponse(VolleyError error) {
 
                         Context context = getApplicationContext();
-                        CharSequence text = error.toString();
+                        CharSequence text = error.getMessage();
                         int duration = Toast.LENGTH_SHORT;
 
                         Toast toast = Toast.makeText(context, text, duration);
                         toast.show();
                     }
-                });
+                }){
+            protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("name", "Marco");
+                params.put("email", "Marco@maromba.com.whey");
+                params.put("password", "FrangoEBatataDoce");
+                return params;
+            };
+        };
         queue.add(jsonObjectRequest);
 
 
