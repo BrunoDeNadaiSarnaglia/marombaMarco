@@ -7,8 +7,10 @@ import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -60,38 +62,21 @@ public class LoginActivity extends ActionBarActivity {
         RequestQueue queue = Volley.newRequestQueue(this);
         String url ="https://maromba-server.herokuapp.com/api";
 
-// Request a string response from the provided URL.
-//        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-//                new Response.Listener<String>() {
-//                    @Override
-//                    public void onResponse(String response) {
-//                        // Display the first 500 characters of the response string.
-//                        Context context = getApplicationContext();
-//                        CharSequence text = response;
-//                        int duration = Toast.LENGTH_SHORT;
-//
-//                        Toast toast = Toast.makeText(context, text, duration);
-//                        toast.show();
-//                    }
-//                }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                Context context = getApplicationContext();
-//                CharSequence text = error.toString();
-//                int duration = Toast.LENGTH_SHORT;
-//
-//                Toast toast = Toast.makeText(context, text, duration);
-//                toast.show();
-//            }
-//        });
-        JSONObject jo = new JSONObject();
-//        jo.put("name", "Marco");
-        jo.put("email", "Marco@maromba.com.whey");
-        jo.put("senha", "FrangoEBatataDoce");
-        JSONObject mainJson = new JSONObject();
-        mainJson.put("body", jo);
+        EditText userInputEditText = (EditText) findViewById(R.id.user_input);
+        final String userInput = userInputEditText.getText().toString();
+        EditText emailInputEditText = (EditText) findViewById(R.id.email_input);
+        final String emailInput = emailInputEditText.getText().toString();
+        EditText passwordInputEditText = (EditText) findViewById(R.id.password_input);
+        final String passwordInput = passwordInputEditText.getText().toString();
 
-        StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST,
+        final HashMap<String, String> params = new HashMap<String, String>()
+        {{
+            put("name", userInput);
+            put("email", emailInput);
+            put("password", passwordInput);
+        }};
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST,
                 "http://10.0.3.2:5000/api/users",
                 new Response.Listener<String>() {
                     @Override
@@ -114,17 +99,12 @@ public class LoginActivity extends ActionBarActivity {
                         Toast toast = Toast.makeText(context, text, duration);
                         toast.show();
                     }
-                }){
-            protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("name", "Marco");
-                params.put("email", "Marco@maromba.com.whey");
-                params.put("password", "FrangoEBatataDoce");
+                }) {
+            @Override
+            public Map<String, String> getParams() {
                 return params;
-            };
+            }
         };
-        queue.add(jsonObjectRequest);
-
-
+        queue.add(stringRequest);
     }
 }
